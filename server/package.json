@@ -1,0 +1,38 @@
+{
+  "name": "airline-reservation-server",
+  "version": "1.0.0",
+  "description": "Airline Reservation System API server (Node.js/Express/PostgreSQL/Redis)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node db/migrate.js",
+    "seed": "node db/run-seed.js",
+    "test": "node --test tests/"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "compression": "^1.7.4",
+    "connect-redis": "^7.1.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "express-session": "^1.18.0",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
+    "morgan": "^1.10.0",
+    "pdfkit": "^0.15.0",
+    "pg": "^8.11.5",
+    "redis": "^4.6.14",
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

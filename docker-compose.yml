@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: airline_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-airline_reservation}
+      POSTGRES_USER: ${DB_USER:-airline_app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_me_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - airline_pgdata:/var/lib/postgresql/data
+      - ./server/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./server/db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-airline_app} -d ${DB_NAME:-airline_reservation}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: airline_redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-change_me_dev_password}"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - airline_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-change_me_dev_password}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  airline_pgdata:
+  airline_redisdata:

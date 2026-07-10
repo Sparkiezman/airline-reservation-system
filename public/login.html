@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Log In — SkyReserve</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="splash-screen" class="splash-screen" aria-hidden="true">
+    <div class="splash-badge">
+        <img src="/assets/logo-mark.svg" alt="" class="splash-mark">
+    </div>
+    <div class="splash-track">
+        <span class="splash-plane">&#9992;&#65039;</span>
+    </div>
+    <div class="splash-word">SkyReserve</div>
+</div>
+<div id="app-navbar"></div>
+
+<main class="auth-shell">
+    <div class="card auth-card card-pad">
+        <h1>Welcome back</h1>
+        <p class="sub">Log in to manage your bookings.</p>
+
+        <div id="form-alert"></div>
+
+        <form id="login-form" novalidate>
+            <div class="field">
+                <label for="email">Email address</label>
+                <input class="input" type="email" id="email" name="email" autocomplete="email" required maxlength="255">
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input class="input" type="password" id="password" name="password" autocomplete="current-password" required maxlength="128">
+                <div class="form-hint"><a href="/forgot-password.html">Forgot your password?</a></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="login-submit">
+                <span class="btn-label">Log In</span>
+            </button>
+        </form>
+
+        <p class="auth-switch">Don't have an account? <a href="/register.html">Sign up</a></p>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/login.js"></script>
+<script src="/js/password-toggle.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/splash.js"></script>
+</body>
+</html>

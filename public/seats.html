@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Select Seats — SkyReserve</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="splash-screen" class="splash-screen" aria-hidden="true">
+    <div class="splash-badge">
+        <img src="/assets/logo-mark.svg" alt="" class="splash-mark">
+    </div>
+    <div class="splash-track">
+        <span class="splash-plane">&#9992;&#65039;</span>
+    </div>
+    <div class="splash-word">SkyReserve</div>
+</div>
+<div id="app-navbar"></div>
+
+<main class="container pb-60">
+    <div id="flight-header" class="card card-pad my-24"></div>
+
+    <div id="page-alert"></div>
+
+    <div class="card card-pad">
+        <div class="seat-legend">
+            <div class="legend-item"><span class="legend-dot available"></span> Available (Economy)</div>
+            <div class="legend-item"><span class="legend-dot available business-available"></span> Available (Business)</div>
+            <div class="legend-item"><span class="legend-dot available first-available"></span> Available (First Class)</div>
+            <div class="legend-item"><span class="legend-dot occupied"></span> Occupied / Held</div>
+            <div class="legend-item"><span class="legend-dot selected"></span> Selected</div>
+        </div>
+        <div id="seat-map" class="seat-map"></div>
+    </div>
+
+    <div id="passenger-panel" class="card card-pad hidden mt-20"></div>
+</main>
+
+<div id="summary-bar" class="card seat-summary-bar hidden">
+    <div class="summary-stat"><div class="label">Seats Selected</div><div class="value" id="summary-count">0 / 0</div></div>
+    <div class="summary-stat"><div class="label">Total Price</div><div class="value" id="summary-total">$0.00</div></div>
+    <button class="btn btn-primary" id="continue-btn" disabled>Continue to Passenger Details</button>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/seats.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/splash.js"></script>
+</body>
+</html>

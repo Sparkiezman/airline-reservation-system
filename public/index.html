@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>SkyReserve — Airline Reservation System</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="splash-screen" class="splash-screen" aria-hidden="true">
+    <div class="splash-badge">
+        <img src="/assets/logo-mark.svg" alt="" class="splash-mark">
+    </div>
+    <div class="splash-track">
+        <span class="splash-plane">&#9992;&#65039;</span>
+    </div>
+    <div class="splash-word">SkyReserve</div>
+</div>
+
+<main>
+    <section class="hero-photo">
+        <div class="hero-photo-frame">
+            <div id="app-navbar"></div>
+
+            <div class="hero-photo-content">
+                <h1>Ready to <em>take off?</em></h1>
+                <p>Search real-time schedules, pick your exact seat, and manage every trip from one secure dashboard — built for customers, airline staff, and administrators alike.</p>
+            </div>
+
+            <form id="hero-search-form" class="hero-widget">
+                <div class="hero-widget-title">Start Booking Your Flight</div>
+                <div class="search-grid">
+                    <div class="field no-mb">
+                        <label for="hero-origin">From</label>
+                        <input class="input" id="hero-origin" placeholder="TPA" maxlength="3" required>
+                    </div>
+                    <div class="field no-mb">
+                        <label for="hero-destination">To</label>
+                        <input class="input" id="hero-destination" placeholder="COS" maxlength="3" required>
+                    </div>
+                    <div class="field no-mb">
+                        <label for="hero-date">Departure date</label>
+                        <input class="input" type="date" id="hero-date" required>
+                    </div>
+                    <div class="field no-mb">
+                        <label for="hero-passengers">Passengers</label>
+                        <input class="input w-90" type="number" id="hero-passengers" min="1" max="9" value="1">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="section container">
+        <div class="section-head">
+            <h2>Everything you need to travel</h2>
+            <p>One platform for booking, boarding, and managing every flight.</p>
+        </div>
+        <div class="feature-grid">
+            <div class="card feature-card">
+                <div class="feature-icon">&#128269;</div>
+                <h3>Live Flight Search</h3>
+                <p>Search by route and date with real-time seat availability across our network.</p>
+            </div>
+            <div class="card feature-card">
+                <div class="feature-icon">&#128100;</div>
+                <h3>Pick Your Seat</h3>
+                <p>Interactive seat maps for Economy and Business, with instant hold-and-hold-release.</p>
+            </div>
+            <div class="card feature-card">
+                <div class="feature-icon">&#128179;</div>
+                <h3>Secure Checkout</h3>
+                <p>Simulated payments with card validation, receipts, and instant e-tickets.</p>
+            </div>
+            <div class="card feature-card">
+                <div class="feature-icon">&#128196;</div>
+                <h3>Digital E-Tickets</h3>
+                <p>Download a boarding-pass style PDF ticket for every confirmed booking.</p>
+            </div>
+            <div class="card feature-card">
+                <div class="feature-icon">&#9992;</div>
+                <h3>Staff Operations</h3>
+                <p>Airline staff manage flights, aircraft, schedules, and passenger check-in.</p>
+            </div>
+            <div class="card feature-card">
+                <div class="feature-icon">&#128737;</div>
+                <h3>Admin Controls</h3>
+                <p>Role management, account status, system settings, and a full audit trail.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/hero-search.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/splash.js"></script>
+</body>
+</html>

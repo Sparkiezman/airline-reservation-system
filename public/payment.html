@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Payment — SkyReserve</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="splash-screen" class="splash-screen" aria-hidden="true">
+    <div class="splash-badge">
+        <img src="/assets/logo-mark.svg" alt="" class="splash-mark">
+    </div>
+    <div class="splash-track">
+        <span class="splash-plane">&#9992;&#65039;</span>
+    </div>
+    <div class="splash-word">SkyReserve</div>
+</div>
+<div id="app-navbar"></div>
+
+<main class="container max-w-720 pb-60">
+    <h1 class="page-title">Payment</h1>
+    <p class="text-muted mt-0">This is a simulated payment gateway. No real charge occurs.</p>
+
+    <div id="page-alert"></div>
+
+    <div id="booking-summary" class="card card-pad mb-20"></div>
+
+    <div class="card card-pad">
+        <h3 class="mt-0">Card Details</h3>
+        <form id="payment-form" novalidate>
+            <div class="field">
+                <label for="cardholderName">Cardholder name</label>
+                <input class="input" id="cardholderName" required maxlength="120">
+            </div>
+            <div class="field">
+                <label for="cardNumber">Card number</label>
+                <input class="input" id="cardNumber" inputmode="numeric" placeholder="4242 4242 4242 4242" required maxlength="23">
+                <div class="form-hint">Test card: any Luhn-valid number succeeds; a number ending in 0002 is declined.</div>
+            </div>
+            <div class="input-row">
+                <div class="field">
+                    <label for="expMonth">Exp. month</label>
+                    <input class="input" id="expMonth" type="number" min="1" max="12" placeholder="12" required>
+                </div>
+                <div class="field">
+                    <label for="expYear">Exp. year</label>
+                    <input class="input" id="expYear" type="number" min="2026" max="2050" placeholder="2028" required>
+                </div>
+                <div class="field">
+                    <label for="cvc">CVC</label>
+                    <input class="input" id="cvc" inputmode="numeric" placeholder="123" required maxlength="4">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="pay-submit">
+                <span class="btn-label">Pay Now</span>
+            </button>
+        </form>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/payment.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/splash.js"></script>
+</body>
+</html>

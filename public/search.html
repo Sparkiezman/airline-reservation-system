@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Find Flights — SkyReserve</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="splash-screen" class="splash-screen" aria-hidden="true">
+    <div class="splash-badge">
+        <img src="/assets/logo-mark.svg" alt="" class="splash-mark">
+    </div>
+    <div class="splash-track">
+        <span class="splash-plane">&#9992;&#65039;</span>
+    </div>
+    <div class="splash-word">SkyReserve</div>
+</div>
+<div id="app-navbar"></div>
+
+<main>
+    <div class="container">
+        <div class="card search-panel">
+            <form id="search-form" class="search-grid" novalidate>
+                <div class="field no-mb">
+                    <label for="origin">From</label>
+                    <input class="input" id="origin" list="airport-list" placeholder="TPA" maxlength="3" required>
+                </div>
+                <div class="field no-mb">
+                    <label for="destination">To</label>
+                    <input class="input" id="destination" list="airport-list" placeholder="COS" maxlength="3" required>
+                </div>
+                <div class="field no-mb">
+                    <label for="date">Departure date</label>
+                    <input class="input" type="date" id="date" required>
+                </div>
+                <div class="field no-mb">
+                    <label for="passengers">Passengers</label>
+                    <input class="input w-90" type="number" id="passengers" min="1" max="9" value="1">
+                </div>
+                <button type="submit" class="btn btn-primary" id="search-submit">Search</button>
+            </form>
+            <datalist id="airport-list"></datalist>
+        </div>
+
+        <div id="results-alert"></div>
+        <div id="flight-list" class="flight-list"></div>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/splash.js"></script>
+</body>
+</html>

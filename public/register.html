@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Sign Up — SkyReserve</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div id="splash-screen" class="splash-screen" aria-hidden="true">
+    <div class="splash-badge">
+        <img src="/assets/logo-mark.svg" alt="" class="splash-mark">
+    </div>
+    <div class="splash-track">
+        <span class="splash-plane">&#9992;&#65039;</span>
+    </div>
+    <div class="splash-word">SkyReserve</div>
+</div>
+<div id="app-navbar"></div>
+
+<main class="auth-shell">
+    <div class="card auth-card card-pad">
+        <h1>Create your account</h1>
+        <p class="sub">Book flights, manage trips, and check in — all in one place.</p>
+
+        <div id="form-alert"></div>
+
+        <form id="register-form" novalidate>
+            <div class="input-row">
+                <div class="field">
+                    <label for="firstName">First name</label>
+                    <input class="input" type="text" id="firstName" required maxlength="100">
+                </div>
+                <div class="field">
+                    <label for="lastName">Last name</label>
+                    <input class="input" type="text" id="lastName" required maxlength="100">
+                </div>
+            </div>
+            <div class="field">
+                <label for="email">Email address</label>
+                <input class="input" type="email" id="email" autocomplete="email" required maxlength="255">
+            </div>
+            <div class="field">
+                <label for="phone">Phone (optional)</label>
+                <input class="input" type="tel" id="phone" maxlength="30">
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input class="input" type="password" id="password" autocomplete="new-password" required maxlength="128">
+                <div class="form-hint">At least 8 characters, with uppercase, lowercase, a digit, and a symbol.</div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="register-submit">
+                <span class="btn-label">Create Account</span>
+            </button>
+        </form>
+
+        <p class="auth-switch">Already have an account? <a href="/login.html">Log in</a></p>
+    </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/register.js"></script>
+<script src="/js/password-toggle.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/splash.js"></script>
+</body>
+</html>
