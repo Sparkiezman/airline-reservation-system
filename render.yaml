@@ -1,0 +1,62 @@
+databases:
+  - name: skyreserve-db
+    plan: free
+    databaseName: airline_reservation
+    user: airline_app
+
+services:
+  - name: skyreserve-redis
+    type: keyvalue
+    plan: free
+    ipAllowList: [] # no public access — only reachable over Render's private network by services in this project
+
+  - name: skyreserve-web
+    type: web
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm run start:render
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: COOKIE_SECURE
+        value: true
+      - key: DB_HOST
+        fromDatabase:
+          name: skyreserve-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: skyreserve-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: skyreserve-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: skyreserve-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: skyreserve-db
+          property: password
+      - key: REDIS_URL
+        fromService:
+          name: skyreserve-redis
+          type: keyvalue
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: BCRYPT_COST
+        value: 12
+      - key: MAX_LOGIN_ATTEMPTS
+        value: 5
+      - key: LOGIN_LOCKOUT_MINUTES
+        value: 15
+      - key: SEAT_HOLD_SECONDS
+        value: 600
+      - key: LOG_LEVEL
+        value: info

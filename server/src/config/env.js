@@ -16,6 +16,9 @@ const env = {
     APP_BASE_URL: process.env.APP_BASE_URL || 'http://localhost:3000',
 
     db: {
+        // A single DATABASE_URL (as most hosts provide) takes priority over
+        // the individual fields, which remain the primary path for local dev.
+        url: process.env.DATABASE_URL || null,
         host: required('DB_HOST', 'localhost'),
         port: Number(process.env.DB_PORT || 5432),
         database: required('DB_NAME', 'airline_reservation'),
@@ -26,6 +29,9 @@ const env = {
     },
 
     redis: {
+        // Same pattern as DATABASE_URL above — a full REDIS_URL (e.g. from a
+        // managed Redis/Key-Value add-on) takes priority over discrete fields.
+        url: process.env.REDIS_URL || null,
         host: process.env.REDIS_HOST || 'localhost',
         port: Number(process.env.REDIS_PORT || 6379),
         password: process.env.REDIS_PASSWORD || undefined,
