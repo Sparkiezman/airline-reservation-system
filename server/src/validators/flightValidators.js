@@ -3,10 +3,15 @@ const { z } = require('zod');
 
 const airportCode = z.string().trim().toUpperCase().length(3, 'Airport code must be 3 letters');
 
+// Search accepts either a 3-letter IATA code or a free-text city/airport
+// name (e.g. "TPA" or "Tampa") — resolved against all three columns in the
+// query itself, so this just needs to be a reasonable, safe-length string.
+const airportSearchTerm = z.string().trim().min(2, 'Enter at least 2 characters').max(100);
+
 const searchFlightsSchema = z.object({
     query: z.object({
-        origin: airportCode,
-        destination: airportCode,
+        origin: airportSearchTerm,
+        destination: airportSearchTerm,
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
         passengers: z.coerce.number().int().min(1).max(9).optional().default(1)
     })

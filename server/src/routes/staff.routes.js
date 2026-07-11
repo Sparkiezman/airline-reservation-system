@@ -3,9 +3,11 @@ const express = require('express');
 const router = express.Router();
 
 const staffController = require('../controllers/staffController');
+const scheduleController = require('../controllers/scheduleController');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { createFlightSchema, updateFlightSchema, flightIdParamSchema, createAircraftSchema } = require('../validators/flightValidators');
+const { createScheduleSchema, updateScheduleStatusSchema } = require('../validators/scheduleValidators');
 const { z } = require('zod');
 
 router.use(requireAuth, requireRole('staff', 'admin'));
@@ -20,6 +22,10 @@ router.post('/booking-items/:bookingItemId/check-in',
     validate(z.object({ params: z.object({ bookingItemId: z.coerce.number().int().positive() }) })),
     staffController.checkInPassenger
 );
+
+router.get('/schedules', scheduleController.listSchedules);
+router.post('/schedules', validate(createScheduleSchema), scheduleController.createSchedule);
+router.put('/schedules/:id/status', validate(updateScheduleStatusSchema), scheduleController.updateScheduleStatus);
 
 router.get('/aircraft', staffController.listAircraft);
 router.post('/aircraft', validate(createAircraftSchema), staffController.createAircraft);

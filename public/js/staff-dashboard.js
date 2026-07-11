@@ -4,11 +4,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const user = await AppSession.requireRole('staff', 'admin');
     if (!user) return;
 
+    function currentTabFromHash() {
+        const hash = window.location.hash.replace('#', '');
+        return ['aircraft', 'schedules'].includes(hash) ? hash : 'flights';
+    }
+
     const content = renderDashboardShell({
         role: 'staff',
-        activeKey: window.location.hash === '#aircraft' ? 'aircraft' : 'flights',
+        activeKey: currentTabFromHash(),
         title: 'Staff Operations',
-        subtitle: 'Manage flights, aircraft, and passenger check-in.'
+        subtitle: 'Manage flights, schedules, aircraft, and passenger check-in.'
     });
 
     const modalRoot = document.getElementById('modal-root');
@@ -38,10 +43,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `
             <div class="tabs">
                 <button type="button" class="tab-btn ${active === 'flights' ? 'active' : ''}" data-tab="flights">Flights</button>
+                <button type="button" class="tab-btn ${active === 'schedules' ? 'active' : ''}" data-tab="schedules">Schedules</button>
                 <button type="button" class="tab-btn ${active === 'aircraft' ? 'active' : ''}" data-tab="aircraft">Aircraft</button>
             </div>
         `;
     }
+
+    const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     // ---------- Flights tab ----------
 
@@ -272,6 +280,162 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // ---------- Schedules tab ----------
+
+    async function renderSchedulesTab() {
+        content.innerHTML = renderTabs('schedules') + `
+            <div class="flex-between mb-16">
+                <div></div>
+                <button class="btn btn-primary btn-sm" id="new-schedule-btn">+ New Schedule</button>
+            </div>
+            <div id="schedules-table" class="card"><div class="empty-hint">Loading...</div></div>
+        `;
+        wireTabButtons();
+        document.getElementById('new-schedule-btn').addEventListener('click', openScheduleFormModal);
+
+        try {
+            const [{ schedules }] = await Promise.all([Api.get('/api/staff/schedules'), loadAircraftOptions()]);
+            renderSchedulesTable(schedules);
+        } catch (err) {
+            document.getElementById('schedules-table').innerHTML = `<div class="alert alert-error">${escapeHtml(err.message)}</div>`;
+        }
+    }
+
+    function renderSchedulesTable(schedules) {
+        const el = document.getElementById('schedules-table');
+        if (!schedules.length) {
+            el.innerHTML = `<div class="empty-hint">No recurring schedules yet. Create one so flights generate automatically for any future date.</div>`;
+            return;
+        }
+        el.innerHTML = `
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Flight</th><th>Route</th><th>Departs</th><th>Days</th><th>Aircraft</th><th>Generated Until</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${schedules.map((s) => `
+                            <tr>
+                                <td>${escapeHtml(s.flightNumber)}</td>
+                                <td>${escapeHtml(s.originCode)} &#10142; ${escapeHtml(s.destinationCode)}</td>
+                                <td>${escapeHtml(s.departureTimeOfDay.slice(0, 5))}</td>
+                                <td>${s.daysOfWeek.slice().sort().map((d) => DAY_LABELS[d]).join(', ')}</td>
+                                <td>${escapeHtml(s.aircraftTailNumber)}</td>
+                                <td>${s.generatedUntil ? formatDate(s.generatedUntil) : '&mdash;'}</td>
+                                <td>${statusBadge(s.status)}</td>
+                                <td>
+                                    <div class="flex gap-8">
+                                        ${s.status === 'active'
+                                            ? `<button class="btn btn-secondary btn-sm schedule-status-btn" data-id="${s.id}" data-status="paused">Pause</button>`
+                                            : s.status === 'paused'
+                                                ? `<button class="btn btn-secondary btn-sm schedule-status-btn" data-id="${s.id}" data-status="active">Resume</button>`
+                                                : ''}
+                                        ${s.status !== 'ended'
+                                            ? `<button class="btn btn-danger btn-sm schedule-status-btn" data-id="${s.id}" data-status="ended">End</button>`
+                                            : ''}
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        el.querySelectorAll('.schedule-status-btn').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const newStatus = btn.dataset.status;
+                if (newStatus === 'ended' && !window.confirm('End this schedule? It will stop generating new flights (already-generated flights are unaffected).')) return;
+                try {
+                    const result = await Api.put(`/api/staff/schedules/${btn.dataset.id}/status`, { status: newStatus });
+                    showToast(newStatus === 'active' ? `Resumed — ${result.flightsCreated} flight(s) generated.` : 'Schedule updated.', 'success');
+                    renderSchedulesTab();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            });
+        });
+    }
+
+    function openScheduleFormModal() {
+        openModal('New Recurring Schedule', `
+            <form id="schedule-form">
+                <div id="schedule-form-alert"></div>
+                <div class="input-row">
+                    <div class="field"><label>Flight number</label><input class="input" name="flightNumber" required maxlength="10" placeholder="FA100"></div>
+                    <div class="field"><label>Aircraft</label>
+                        <select class="input" name="aircraftId" required>
+                            ${aircraftCache.map((a) => `<option value="${a.id}">${escapeHtml(a.tail_number)} (${escapeHtml(a.model)})</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="field"><label>Origin code</label><input class="input" name="originCode" required maxlength="3" placeholder="TPA"></div>
+                    <div class="field"><label>Destination code</label><input class="input" name="destinationCode" required maxlength="3" placeholder="COS"></div>
+                </div>
+                <div class="input-row">
+                    <div class="field"><label>Departure time (local, 24h)</label><input class="input" type="time" name="departureTimeOfDay" required></div>
+                    <div class="field"><label>Arrival time (local, 24h)</label><input class="input" type="time" name="arrivalTimeOfDay" required></div>
+                </div>
+                <div class="field">
+                    <label>Operates on</label>
+                    <div class="flex gap-12" style="flex-wrap:wrap">
+                        ${DAY_LABELS.map((label, i) => `
+                            <label class="flex gap-8" style="align-items:center; font-weight:400">
+                                <input type="checkbox" name="daysOfWeek" value="${i}" ${i >= 1 && i <= 5 ? 'checked' : ''}> ${label}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="field"><label>Economy price ($)</label><input class="input" type="number" step="0.01" min="0" name="basePriceEconomy" required></div>
+                    <div class="field"><label>Business price ($)</label><input class="input" type="number" step="0.01" min="0" name="basePriceBusiness" required></div>
+                    <div class="field"><label>First class price ($)</label><input class="input" type="number" step="0.01" min="0" name="basePriceFirst" value="0"></div>
+                </div>
+                <div class="input-row">
+                    <div class="field"><label>Gate</label><input class="input" name="gate" maxlength="10"></div>
+                    <div class="field"><label>Terminal</label><input class="input" name="terminal" maxlength="10"></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create Schedule</button>
+            </form>
+        `);
+
+        document.getElementById('schedule-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const alertBox = document.getElementById('schedule-form-alert');
+            try {
+                const [depH, depM] = fd.get('departureTimeOfDay').split(':').map(Number);
+                const [arrH, arrM] = fd.get('arrivalTimeOfDay').split(':').map(Number);
+                let durationMinutes = (arrH * 60 + arrM) - (depH * 60 + depM);
+                if (durationMinutes <= 0) durationMinutes += 24 * 60; // arrival is next day
+
+                const daysOfWeek = fd.getAll('daysOfWeek').map(Number);
+                if (!daysOfWeek.length) throw new Error('Select at least one operating day');
+
+                const result = await Api.post('/api/staff/schedules', {
+                    flightNumber: fd.get('flightNumber'),
+                    aircraftId: Number(fd.get('aircraftId')),
+                    originCode: fd.get('originCode'),
+                    destinationCode: fd.get('destinationCode'),
+                    departureTimeOfDay: fd.get('departureTimeOfDay'),
+                    durationMinutes,
+                    daysOfWeek,
+                    basePriceEconomyCents: Math.round(Number(fd.get('basePriceEconomy')) * 100),
+                    basePriceBusinessCents: Math.round(Number(fd.get('basePriceBusiness')) * 100),
+                    basePriceFirstCents: Math.round(Number(fd.get('basePriceFirst') || 0) * 100),
+                    gate: fd.get('gate'),
+                    terminal: fd.get('terminal')
+                });
+                closeModal();
+                showToast(`Schedule created — ${result.flightsCreated} flight(s) generated.`, 'success');
+                renderSchedulesTab();
+            } catch (err) {
+                let msg = err.message;
+                if (err.details && err.details.length) msg = err.details.map((d) => d.message).join(' ');
+                alertBox.innerHTML = `<div class="alert alert-error">${escapeHtml(msg)}</div>`;
+            }
+        });
+    }
+
     // ---------- Aircraft tab ----------
 
     async function renderAircraftTab() {
@@ -394,16 +558,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function renderTab(tab) {
+        if (tab === 'schedules') renderSchedulesTab();
+        else if (tab === 'aircraft') renderAircraftTab();
+        else renderFlightsTab();
+    }
+
     function wireTabButtons() {
         content.querySelectorAll('.tab-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
                 window.location.hash = btn.dataset.tab === 'flights' ? '' : btn.dataset.tab;
-                if (btn.dataset.tab === 'flights') renderFlightsTab();
-                else renderAircraftTab();
+                renderTab(btn.dataset.tab);
             });
         });
     }
 
-    if (window.location.hash === '#aircraft') renderAircraftTab();
-    else renderFlightsTab();
+    renderTab(currentTabFromHash());
 });

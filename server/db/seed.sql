@@ -45,99 +45,55 @@ INSERT INTO aircraft (tail_number, model, manufacturer, total_seats, seat_layout
      'active')
 ON CONFLICT (tail_number) DO NOTHING;
 
--- ---------- Flights ----------
--- FA802 TPA -> COS matches the reference UI mockups (seat B4, $120 economy).
-INSERT INTO flights (flight_number, aircraft_id, origin_code, destination_code, departure_time, arrival_time,
-                      base_price_economy_cents, base_price_business_cents, base_price_first_cents, gate, terminal, status, created_by)
-SELECT 'FA802', a.id, 'TPA', 'COS',
-       (CURRENT_DATE + INTERVAL '3 day' + TIME '06:00'),
-       (CURRENT_DATE + INTERVAL '3 day' + TIME '09:00'),
-       12000, 34000, 60000, 'C12', '3', 'scheduled',
+-- ---------- Flight Schedules ----------
+-- Recurring routes, not one-off flights: db/run-seed.js generates real
+-- `flights` + `flight_seats` rows from these for a rolling 90-day window
+-- right after this file runs (see services/scheduleGenerator.js), so any
+-- date in that window is genuinely searchable — not just one fixed date.
+INSERT INTO flight_schedules (flight_number, aircraft_id, origin_code, destination_code, departure_time_of_day,
+                               duration_minutes, days_of_week, base_price_economy_cents, base_price_business_cents,
+                               base_price_first_cents, gate, terminal, created_by)
+SELECT 'FA802', a.id, 'TPA', 'COS', '06:00', 180, ARRAY[0,1,2,3,4,5,6]::smallint[],
+       12000, 34000, 60000, 'C12', '3',
        (SELECT id FROM users WHERE email = 'staff@airline.test')
-FROM aircraft a WHERE a.tail_number = 'N802FA';
+FROM aircraft a WHERE a.tail_number = 'N802FA'
+ON CONFLICT (flight_number) DO NOTHING;
 
-INSERT INTO flights (flight_number, aircraft_id, origin_code, destination_code, departure_time, arrival_time,
-                      base_price_economy_cents, base_price_business_cents, base_price_first_cents, gate, terminal, status, created_by)
-SELECT 'FA118', a.id, 'COS', 'TPA',
-       (CURRENT_DATE + INTERVAL '10 day' + TIME '14:30'),
-       (CURRENT_DATE + INTERVAL '10 day' + TIME '17:45'),
-       13500, 36000, 65000, 'B4', '2', 'scheduled',
+INSERT INTO flight_schedules (flight_number, aircraft_id, origin_code, destination_code, departure_time_of_day,
+                               duration_minutes, days_of_week, base_price_economy_cents, base_price_business_cents,
+                               base_price_first_cents, gate, terminal, created_by)
+SELECT 'FA118', a.id, 'COS', 'TPA', '14:30', 195, ARRAY[0,1,2,3,4,5,6]::smallint[],
+       13500, 36000, 65000, 'B4', '2',
        (SELECT id FROM users WHERE email = 'staff@airline.test')
-FROM aircraft a WHERE a.tail_number = 'N118FA';
+FROM aircraft a WHERE a.tail_number = 'N118FA'
+ON CONFLICT (flight_number) DO NOTHING;
 
-INSERT INTO flights (flight_number, aircraft_id, origin_code, destination_code, departure_time, arrival_time,
-                      base_price_economy_cents, base_price_business_cents, base_price_first_cents, gate, terminal, status, created_by)
-SELECT 'FA245', a.id, 'JFK', 'LAX',
-       (CURRENT_DATE + INTERVAL '5 day' + TIME '08:15'),
-       (CURRENT_DATE + INTERVAL '5 day' + TIME '11:35'),
-       21000, 52000, 90000, 'A22', '4', 'scheduled',
+INSERT INTO flight_schedules (flight_number, aircraft_id, origin_code, destination_code, departure_time_of_day,
+                               duration_minutes, days_of_week, base_price_economy_cents, base_price_business_cents,
+                               base_price_first_cents, gate, terminal, created_by)
+SELECT 'FA245', a.id, 'JFK', 'LAX', '08:15', 200, ARRAY[0,1,2,3,4,5,6]::smallint[],
+       21000, 52000, 90000, 'A22', '4',
        (SELECT id FROM users WHERE email = 'staff@airline.test')
-FROM aircraft a WHERE a.tail_number = 'N118FA';
+FROM aircraft a WHERE a.tail_number = 'N118FA'
+ON CONFLICT (flight_number) DO NOTHING;
 
-INSERT INTO flights (flight_number, aircraft_id, origin_code, destination_code, departure_time, arrival_time,
-                      base_price_economy_cents, base_price_business_cents, base_price_first_cents, gate, terminal, status, created_by)
-SELECT 'FA309', a.id, 'ATL', 'MIA',
-       (CURRENT_DATE + INTERVAL '4 day' + TIME '10:00'),
-       (CURRENT_DATE + INTERVAL '4 day' + TIME '11:45'),
-       9800, 24000, 0, 'D5', '1', 'scheduled',
+INSERT INTO flight_schedules (flight_number, aircraft_id, origin_code, destination_code, departure_time_of_day,
+                               duration_minutes, days_of_week, base_price_economy_cents, base_price_business_cents,
+                               base_price_first_cents, gate, terminal, created_by)
+SELECT 'FA309', a.id, 'ATL', 'MIA', '10:00', 105, ARRAY[0,1,2,3,4,5,6]::smallint[],
+       9800, 24000, 0, 'D5', '1',
        (SELECT id FROM users WHERE email = 'staff@airline.test')
-FROM aircraft a WHERE a.tail_number = 'N305FA';
+FROM aircraft a WHERE a.tail_number = 'N305FA'
+ON CONFLICT (flight_number) DO NOTHING;
 
-INSERT INTO flights (flight_number, aircraft_id, origin_code, destination_code, departure_time, arrival_time,
-                      base_price_economy_cents, base_price_business_cents, base_price_first_cents, gate, terminal, status, created_by)
-SELECT 'FA412', a.id, 'ORD', 'DEN',
-       (CURRENT_DATE + INTERVAL '6 day' + TIME '18:20'),
-       (CURRENT_DATE + INTERVAL '6 day' + TIME '20:05'),
-       15500, 38000, 70000, 'E9', '2', 'scheduled',
+INSERT INTO flight_schedules (flight_number, aircraft_id, origin_code, destination_code, departure_time_of_day,
+                               duration_minutes, days_of_week, base_price_economy_cents, base_price_business_cents,
+                               base_price_first_cents, gate, terminal, created_by)
+SELECT 'FA412', a.id, 'ORD', 'DEN', '18:20', 105, ARRAY[0,1,2,3,4,5,6]::smallint[],
+       15500, 38000, 70000, 'E9', '2',
        (SELECT id FROM users WHERE email = 'staff@airline.test')
-FROM aircraft a WHERE a.tail_number = 'N118FA';
-
--- ---------- Generate flight_seats for every flight from its aircraft seat_layout ----------
-INSERT INTO flight_seats (flight_id, seat_number, class, price_cents, status)
-SELECT f.id,
-       (c.col || r.row_num) AS seat_number,
-       CASE WHEN r.row_num BETWEEN (sec->>'rowStart')::int AND (sec->>'rowEnd')::int
-            THEN sec->>'class' END AS class,
-       CASE (sec->>'class')
-            WHEN 'first' THEN f.base_price_first_cents
-            WHEN 'business' THEN f.base_price_business_cents
-            ELSE f.base_price_economy_cents END AS price_cents,
-       'available'
-FROM flights f
-JOIN aircraft a ON a.id = f.aircraft_id
-CROSS JOIN LATERAL generate_series(1, (a.seat_layout->>'rows')::int) AS r(row_num)
-CROSS JOIN LATERAL jsonb_array_elements_text(a.seat_layout->'cols') AS c(col)
-CROSS JOIN LATERAL jsonb_array_elements(a.seat_layout->'sections') AS sec
-WHERE r.row_num BETWEEN (sec->>'rowStart')::int AND (sec->>'rowEnd')::int
-ON CONFLICT (flight_id, seat_number) DO NOTHING;
-
--- ---------- Pre-book seat B4 on FA802 for the demo customer, matching the reference UI ----------
-DO $$
-DECLARE
-    v_flight_id BIGINT;
-    v_seat_id BIGINT;
-    v_user_id BIGINT;
-    v_booking_id BIGINT;
-BEGIN
-    SELECT id INTO v_flight_id FROM flights WHERE flight_number = 'FA802' LIMIT 1;
-    SELECT id INTO v_seat_id FROM flight_seats WHERE flight_id = v_flight_id AND seat_number = 'B4';
-    SELECT id INTO v_user_id FROM users WHERE email = 'customer@airline.test';
-
-    IF v_flight_id IS NOT NULL AND v_seat_id IS NOT NULL AND v_user_id IS NOT NULL
-       AND NOT EXISTS (SELECT 1 FROM bookings WHERE booking_ref = 'DEMO001') THEN
-        INSERT INTO bookings (booking_ref, user_id, flight_id, status, total_price_cents)
-        VALUES ('DEMO001', v_user_id, v_flight_id, 'confirmed', 12000)
-        RETURNING id INTO v_booking_id;
-
-        INSERT INTO booking_items (booking_id, seat_id, passenger_first_name, passenger_last_name, class, price_cents, status)
-        VALUES (v_booking_id, v_seat_id, 'Justin', 'Comstock', 'economy', 12000, 'booked');
-
-        UPDATE flight_seats SET status = 'booked' WHERE id = v_seat_id;
-
-        INSERT INTO payments (booking_id, amount_cents, method, card_last4, card_brand, status, transaction_ref)
-        VALUES (v_booking_id, 12000, 'card', '4242', 'visa', 'succeeded', 'DEMO-TXN-0001');
-    END IF;
-END $$;
+FROM aircraft a WHERE a.tail_number = 'N118FA'
+ON CONFLICT (flight_number) DO NOTHING;
 
 -- ---------- System settings ----------
 INSERT INTO system_settings (key, value) VALUES

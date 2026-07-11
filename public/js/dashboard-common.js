@@ -8,6 +8,7 @@ const DASH_NAV = {
     ],
     staff: [
         { key: 'flights', href: '/staff-dashboard.html', label: 'Flights', icon: '&#9992;' },
+        { key: 'schedules', href: '/staff-dashboard.html#schedules', label: 'Schedules', icon: '&#128197;' },
         { key: 'aircraft', href: '/staff-dashboard.html#aircraft', label: 'Aircraft', icon: '&#128736;' },
         { key: 'profile', href: '/profile.html', label: 'Profile', icon: '&#128100;' }
     ],
@@ -62,7 +63,10 @@ function statusBadge(status) {
         boarding: 'badge-yellow',
         departed: 'badge-gray',
         arrived: 'badge-gray',
-        delayed: 'badge-yellow'
+        delayed: 'badge-yellow',
+        active: 'badge-green',
+        paused: 'badge-yellow',
+        ended: 'badge-gray'
     };
     const cls = map[status] || 'badge-gray';
     return `<span class="badge ${cls}">${escapeHtml(status.replace('_', ' '))}</span>`;

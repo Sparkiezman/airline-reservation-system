@@ -46,8 +46,8 @@ async function searchFlights(req, res, next) {
              JOIN airports o ON o.code = f.origin_code
              JOIN airports d ON d.code = f.destination_code
              LEFT JOIN flight_seats fs ON fs.flight_id = f.id
-             WHERE f.origin_code = $1
-               AND f.destination_code = $2
+             WHERE (o.code = UPPER($1) OR o.city ILIKE '%' || $1 || '%' OR o.name ILIKE '%' || $1 || '%')
+               AND (d.code = UPPER($2) OR d.city ILIKE '%' || $2 || '%' OR d.name ILIKE '%' || $2 || '%')
                AND f.departure_time::date = $3::date
                AND f.status NOT IN ('cancelled')
              GROUP BY f.id, o.city, d.city

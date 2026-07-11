@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const origin = document.getElementById('hero-origin').value.trim().toUpperCase();
-        const destination = document.getElementById('hero-destination').value.trim().toUpperCase();
+        const origin = document.getElementById('hero-origin').value.trim();
+        const destination = document.getElementById('hero-destination').value.trim();
         const date = dateInput.value;
         const passengers = document.getElementById('hero-passengers').value || 1;
         if (!origin || !destination || !date) return;

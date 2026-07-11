@@ -60,6 +60,34 @@ CREATE TABLE IF NOT EXISTS aircraft (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- A recurring route template. Staff create one of these, and the app
+-- generates real `flights` rows from it (see services/scheduleGenerator.js)
+-- for a rolling window of days ahead, on whichever weekdays it operates.
+CREATE TABLE IF NOT EXISTS flight_schedules (
+    id                      BIGSERIAL PRIMARY KEY,
+    flight_number           VARCHAR(10) NOT NULL UNIQUE,
+    aircraft_id             BIGINT NOT NULL REFERENCES aircraft(id),
+    origin_code             CHAR(3) NOT NULL REFERENCES airports(code),
+    destination_code        CHAR(3) NOT NULL REFERENCES airports(code),
+    departure_time_of_day   TIME NOT NULL,
+    duration_minutes        INTEGER NOT NULL CHECK (duration_minutes > 0 AND duration_minutes <= 1440),
+    -- 0=Sunday .. 6=Saturday (matches JS Date#getDay() and Postgres EXTRACT(DOW ...))
+    days_of_week            SMALLINT[] NOT NULL,
+    base_price_economy_cents  INTEGER NOT NULL CHECK (base_price_economy_cents >= 0),
+    base_price_business_cents INTEGER NOT NULL CHECK (base_price_business_cents >= 0),
+    base_price_first_cents  INTEGER NOT NULL DEFAULT 0 CHECK (base_price_first_cents >= 0),
+    gate                    VARCHAR(10),
+    terminal                VARCHAR(10),
+    status                  VARCHAR(20) NOT NULL DEFAULT 'active'
+                                CHECK (status IN ('active', 'paused', 'ended')),
+    generated_until         DATE,
+    created_by              BIGINT REFERENCES users(id),
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT chk_schedule_route_diff CHECK (origin_code <> destination_code)
+);
+CREATE INDEX IF NOT EXISTS idx_flight_schedules_status ON flight_schedules (status);
+
 CREATE TABLE IF NOT EXISTS flights (
     id                      BIGSERIAL PRIMARY KEY,
     flight_number           VARCHAR(10) NOT NULL,
@@ -75,14 +103,21 @@ CREATE TABLE IF NOT EXISTS flights (
     terminal                VARCHAR(10),
     status                  VARCHAR(20) NOT NULL DEFAULT 'scheduled'
                                 CHECK (status IN ('scheduled','boarding','departed','arrived','cancelled','delayed')),
+    schedule_id             BIGINT REFERENCES flight_schedules(id),
     created_by              BIGINT REFERENCES users(id),
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT chk_route_diff CHECK (origin_code <> destination_code),
     CONSTRAINT chk_times CHECK (arrival_time > departure_time)
 );
+-- Retrofit for databases created before flight_schedules existed (CREATE
+-- TABLE IF NOT EXISTS above is a no-op against them, so the column needs
+-- its own idempotent statement).
+ALTER TABLE flights ADD COLUMN IF NOT EXISTS schedule_id BIGINT REFERENCES flight_schedules(id);
+
 CREATE INDEX IF NOT EXISTS idx_flights_route_date ON flights (origin_code, destination_code, departure_time);
 CREATE INDEX IF NOT EXISTS idx_flights_status ON flights (status);
+CREATE INDEX IF NOT EXISTS idx_flights_schedule ON flights (schedule_id);
 
 CREATE TABLE IF NOT EXISTS flight_seats (
     id              BIGSERIAL PRIMARY KEY,
@@ -179,6 +214,10 @@ CREATE TRIGGER trg_users_updated_at BEFORE UPDATE ON users
 
 DROP TRIGGER IF EXISTS trg_aircraft_updated_at ON aircraft;
 CREATE TRIGGER trg_aircraft_updated_at BEFORE UPDATE ON aircraft
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+DROP TRIGGER IF EXISTS trg_flight_schedules_updated_at ON flight_schedules;
+CREATE TRIGGER trg_flight_schedules_updated_at BEFORE UPDATE ON flight_schedules
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 DROP TRIGGER IF EXISTS trg_flights_updated_at ON flights;

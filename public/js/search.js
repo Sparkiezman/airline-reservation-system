@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const origin = document.getElementById('origin').value.trim().toUpperCase();
-        const destination = document.getElementById('destination').value.trim().toUpperCase();
+        const origin = document.getElementById('origin').value.trim();
+        const destination = document.getElementById('destination').value.trim();
         const date = dateInput.value;
         const passengers = document.getElementById('passengers').value || 1;
         if (!origin || !destination || !date) return;
