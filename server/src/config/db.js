@@ -1,7 +1,13 @@
 'use strict';
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const env = require('./env');
 const logger = require('../utils/logger');
+
+// By default node-postgres parses DATE columns into a JS Date at LOCAL
+// midnight, which silently drifts by the server's UTC offset whenever that
+// value is later round-tripped through date-only arithmetic. Keeping the
+// raw 'YYYY-MM-DD' string avoids that entire class of off-by-one bugs.
+types.setTypeParser(types.builtins.DATE, (val) => val);
 
 const pool = new Pool(
     env.db.url

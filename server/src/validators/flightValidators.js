@@ -8,6 +8,12 @@ const airportCode = z.string().trim().toUpperCase().length(3, 'Airport code must
 // query itself, so this just needs to be a reasonable, safe-length string.
 const airportSearchTerm = z.string().trim().min(2, 'Enter at least 2 characters').max(100);
 
+const listAirportsSchema = z.object({
+    query: z.object({
+        q: z.string().trim().min(1).max(100).optional()
+    })
+});
+
 const searchFlightsSchema = z.object({
     query: z.object({
         origin: airportSearchTerm,
@@ -70,6 +76,7 @@ const createAircraftSchema = z.object({
 });
 
 module.exports = {
+    listAirportsSchema,
     searchFlightsSchema,
     flightIdParamSchema,
     createFlightSchema,

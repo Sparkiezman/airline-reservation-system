@@ -18,16 +18,9 @@ VALUES
 ON CONFLICT (email) DO NOTHING;
 
 -- ---------- Airports ----------
-INSERT INTO airports (code, name, city, country) VALUES
-    ('TPA', 'Tampa International Airport', 'Tampa', 'USA'),
-    ('COS', 'Colorado Springs Airport', 'Colorado Springs', 'USA'),
-    ('JFK', 'John F. Kennedy International Airport', 'New York', 'USA'),
-    ('LAX', 'Los Angeles International Airport', 'Los Angeles', 'USA'),
-    ('ORD', 'O''Hare International Airport', 'Chicago', 'USA'),
-    ('ATL', 'Hartsfield-Jackson Atlanta International Airport', 'Atlanta', 'USA'),
-    ('MIA', 'Miami International Airport', 'Miami', 'USA'),
-    ('DEN', 'Denver International Airport', 'Denver', 'USA')
-ON CONFLICT (code) DO NOTHING;
+-- The full global airport list is loaded separately by db/import-airports.js
+-- (run before this file, see db/run-seed.js) from a committed OurAirports
+-- extract, so every airport referenced below already exists by this point.
 
 -- ---------- Aircraft ----------
 -- Row 1 is carved out as First Class on the two larger aircraft (row 4,

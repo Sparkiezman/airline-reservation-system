@@ -1,11 +1,13 @@
 'use strict';
 /**
- * Loads sample data in three steps, safe to re-run:
- *   1. seed.sql — users, airports, aircraft, and flight_schedules (all
- *      idempotent via ON CONFLICT DO NOTHING)
- *   2. Generate real flight/seat instances from those schedules for the
+ * Loads sample data in four steps, safe to re-run:
+ *   1. import-airports.js — the full global airport list (flight_schedules
+ *      below references airports by code, so this must run first)
+ *   2. seed.sql — users, aircraft, and flight_schedules (all idempotent
+ *      via ON CONFLICT DO NOTHING)
+ *   3. Generate real flight/seat instances from those schedules for the
  *      next 90 days (same generator the running server uses)
- *   3. seed-demo-booking.sql — the one pre-booked demo seat, which needs
+ *   4. seed-demo-booking.sql — the one pre-booked demo seat, which needs
  *      an actual flight_seats row to already exist, hence the ordering
  *
  * Usage: npm run seed
@@ -15,8 +17,13 @@ const fs = require('fs');
 const path = require('path');
 const { pool, query } = require('../src/config/db');
 const scheduleGenerator = require('../src/services/scheduleGenerator');
+const { importAirports } = require('./import-airports');
 
 async function main() {
+    console.log('Importing global airport data ...');
+    const airportCount = await importAirports();
+    console.log(`Imported ${airportCount} airport(s).`);
+
     console.log('Applying seed.sql ...');
     await query(fs.readFileSync(path.join(__dirname, 'seed.sql'), 'utf8'));
     console.log('Seed data applied successfully.');

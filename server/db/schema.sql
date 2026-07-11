@@ -40,8 +40,13 @@ CREATE TABLE IF NOT EXISTS airports (
     code        CHAR(3) PRIMARY KEY,
     name        VARCHAR(150) NOT NULL,
     city        VARCHAR(100) NOT NULL,
-    country     VARCHAR(100) NOT NULL
+    country     VARCHAR(100) NOT NULL,
+    latitude_deg  DOUBLE PRECISION,
+    longitude_deg DOUBLE PRECISION
 );
+-- Retrofit for databases created before these columns existed.
+ALTER TABLE airports ADD COLUMN IF NOT EXISTS latitude_deg DOUBLE PRECISION;
+ALTER TABLE airports ADD COLUMN IF NOT EXISTS longitude_deg DOUBLE PRECISION;
 
 CREATE TABLE IF NOT EXISTS aircraft (
     id              BIGSERIAL PRIMARY KEY,
@@ -81,12 +86,16 @@ CREATE TABLE IF NOT EXISTS flight_schedules (
     status                  VARCHAR(20) NOT NULL DEFAULT 'active'
                                 CHECK (status IN ('active', 'paused', 'ended')),
     generated_until         DATE,
+    is_auto_generated       BOOLEAN NOT NULL DEFAULT FALSE,
     created_by              BIGINT REFERENCES users(id),
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT chk_schedule_route_diff CHECK (origin_code <> destination_code)
 );
+-- Retrofit for databases created before this column existed.
+ALTER TABLE flight_schedules ADD COLUMN IF NOT EXISTS is_auto_generated BOOLEAN NOT NULL DEFAULT FALSE;
 CREATE INDEX IF NOT EXISTS idx_flight_schedules_status ON flight_schedules (status);
+CREATE INDEX IF NOT EXISTS idx_flight_schedules_route ON flight_schedules (origin_code, destination_code) WHERE status = 'active';
 
 CREATE TABLE IF NOT EXISTS flights (
     id                      BIGSERIAL PRIMARY KEY,
