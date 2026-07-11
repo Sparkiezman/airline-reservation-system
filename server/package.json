@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
-    "start:render": "node db/migrate.js && node db/run-seed.js && node src/server.js",
+    "start:prod": "node db/migrate.js && node db/run-seed.js; node src/server.js",
     "dev": "node --watch src/server.js",
     "migrate": "node db/migrate.js",
     "seed": "node db/run-seed.js",
