@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('hero-date');
     dateInput.min = new Date().toISOString().slice(0, 10);
 
+    attachAirportAutocomplete(document.getElementById('hero-origin'));
+    attachAirportAutocomplete(document.getElementById('hero-destination'));
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         const origin = document.getElementById('hero-origin').value.trim();

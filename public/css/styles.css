@@ -252,6 +252,44 @@ button { font-family: inherit; }
 .input-row { display: flex; gap: 14px; }
 .input-row > * { flex: 1; }
 
+/* ===================== Airport autocomplete ===================== */
+.autocomplete-wrapper { position: relative; }
+.autocomplete-list {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    max-height: 280px;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+.autocomplete-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.autocomplete-item.active, .autocomplete-item:hover { background: var(--surface-hover); }
+.autocomplete-city { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.autocomplete-code {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+}
+
 .password-field { position: relative; }
 .password-field .input { padding-right: 44px; }
 .password-toggle-btn {

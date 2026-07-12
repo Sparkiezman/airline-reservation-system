@@ -5,33 +5,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resultsAlert = document.getElementById('results-alert');
     const flightList = document.getElementById('flight-list');
     const dateInput = document.getElementById('date');
-    const airportList = document.getElementById('airport-list');
 
     dateInput.min = new Date().toISOString().slice(0, 10);
 
-    function renderAirportOptions(airports) {
-        airportList.innerHTML = airports
-            .map((a) => `<option value="${escapeHtml(a.code)}">${escapeHtml(a.city)}, ${escapeHtml(a.country)} (${escapeHtml(a.code)})</option>`)
-            .join('');
-    }
-
-    let debounceTimer;
-    function wireAirportAutocomplete(input) {
-        input.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            const term = input.value.trim();
-            if (term.length < 2) return;
-            debounceTimer = setTimeout(async () => {
-                try {
-                    const { airports } = await Api.get(`/api/flights/airports?q=${encodeURIComponent(term)}`);
-                    renderAirportOptions(airports);
-                } catch { /* datalist is a nice-to-have; ignore failures */ }
-            }, 200);
-        });
-    }
-
-    wireAirportAutocomplete(document.getElementById('origin'));
-    wireAirportAutocomplete(document.getElementById('destination'));
+    attachAirportAutocomplete(document.getElementById('origin'));
+    attachAirportAutocomplete(document.getElementById('destination'));
 
     function renderFlights(flights, passengers) {
         if (!flights.length) {

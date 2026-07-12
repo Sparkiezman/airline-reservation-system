@@ -25,11 +25,11 @@
             <form id="search-form" class="search-grid" novalidate>
                 <div class="field no-mb">
                     <label for="origin">From</label>
-                    <input class="input" id="origin" list="airport-list" placeholder="Tampa or TPA" maxlength="100" required>
+                    <input class="input" id="origin" placeholder="Tampa or TPA" maxlength="100" required>
                 </div>
                 <div class="field no-mb">
                     <label for="destination">To</label>
-                    <input class="input" id="destination" list="airport-list" placeholder="Colorado Springs or COS" maxlength="100" required>
+                    <input class="input" id="destination" placeholder="Colorado Springs or COS" maxlength="100" required>
                 </div>
                 <div class="field no-mb">
                     <label for="date">Departure date</label>
@@ -41,7 +41,6 @@
                 </div>
                 <button type="submit" class="btn btn-primary" id="search-submit">Search</button>
             </form>
-            <datalist id="airport-list"></datalist>
         </div>
 
         <div id="results-alert"></div>
@@ -51,6 +50,7 @@
 
 <script src="/js/api.js"></script>
 <script src="/js/nav.js"></script>
+<script src="/js/airport-autocomplete.js"></script>
 <script src="/js/search.js"></script>
 <script src="/js/footer.js"></script>
 <script src="/js/splash.js"></script>
