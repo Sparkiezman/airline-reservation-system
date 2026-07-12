@@ -1,0 +1,15 @@
+name: Keep Render service awake
+
+on:
+  schedule:
+    # Offset from the top of the hour — GitHub's scheduler queues jobs and
+    # can delay runs during the high-load minutes around :00.
+    - cron: '3,13,23,33,43,53 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: curl -sf --max-time 60 https://skyreserve-web.onrender.com/healthz
